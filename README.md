@@ -1,6 +1,6 @@
 # User Service
 
-Spring Boot 3 authentication service with:
+Spring Boot 4 authentication service with:
 - JWT access tokens
 - Refresh token rotation with theft detection
 - Role-based access control (ADMIN / USER)
