@@ -7,6 +7,18 @@ Spring Boot 4 authentication service with:
 - Full CRUD operations
 - Global exception handling
 
+## 🛠️ Tech Stack
+
+- **Java 17** – Core language
+- **Spring Boot 4.1.0** – Framework
+- **Spring Security** – Authentication & Authorization
+- **Spring Data JPA** – ORM and database access
+- **PostgreSQL** – Production database (H2 for local testing)
+- **JWT (JJWT)** – Access token generation and validation
+- **Lombok** – Boilerplate reduction
+- **Maven** – Build tool and dependency management
+- **Docker** – Containerization
+
 ## Setup
 
 1. Clone the repo
