@@ -1,3 +1,7 @@
+![Java](https://img.shields.io/badge/Java-17-blue)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.3-green)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue)
+
 # User Service
 
 Spring Boot 4 authentication service with:
