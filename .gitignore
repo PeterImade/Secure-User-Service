@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Application secrets (CRITICAL)
+src/main/resources/application.properties
