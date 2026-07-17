@@ -55,7 +55,7 @@ You can test all endpoints directly from the browser. Click **"Authorize"** to a
 docker compose up --build
 
 # Start the app + PostgreSQL
-docker-compose up
+docker-compose up -d
 
 # Stop everything
 docker-compose down
