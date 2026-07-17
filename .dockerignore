@@ -1,0 +1,35 @@
+# Compiled output
+target/
+*.jar
+*.war
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+
+# Git
+.git/
+.gitignore
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker files (don't copy these into the image)
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+# Maven wrapper (not needed inside container)
+mvnw.cmd
+
+# README and other docs
+README.md

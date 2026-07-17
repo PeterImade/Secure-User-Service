@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  # PostgreSQL database
+  postgres:
+    image: postgres:15
+    container_name: user-service-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: PASSWORD
+      POSTGRES_DB: User_Service
+    ports:
+      - "5433:5432"  # Map host port 5433 to container port 5432 (to avoid conflict with local PostgreSQL)
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  # Your Spring Boot application
+  app:
+    build: . #(build the image from the Dockerfile)
+    container_name: user-service-app
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/User_Service
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: PASSWORD
+      JWT_SECRET: mysecretkey
+      JWT_EXPIRATION: 900000
+      JWT_REFRESH_EXPIRATION: 604800000
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
