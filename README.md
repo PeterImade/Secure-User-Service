@@ -52,10 +52,10 @@ You can test all endpoints directly from the browser. Click **"Authorize"** to a
 
 ```bash
 # Build the image
-docker build -t secure-user-service .
+docker compose up --build
 
 # Start the app + PostgreSQL
-docker-compose up -d
+docker-compose up
 
 # Stop everything
 docker-compose down
