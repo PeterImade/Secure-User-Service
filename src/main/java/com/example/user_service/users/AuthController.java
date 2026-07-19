@@ -37,17 +37,9 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> loginUser(@Valid @RequestBody LoginRequest loginRequest)
     {
-        var userResponse = userService.authenticateUser(loginRequest.email(), loginRequest.password());
+        var authResponse = userService.authenticateUser(loginRequest.email(), loginRequest.password());
 
-        // Generate access token
-        String accessToken = jwtService.generateToken(loginRequest.email());
-
-        // Generate refresh token
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(
-                userService.findUserByEmail(loginRequest.email()) // You'll need to add this method
-        );
-
-        return ResponseEntity.ok(new AuthResponse(accessToken, refreshToken.getToken(), userResponse));
+        return ResponseEntity.ok(authResponse);
     }
 
     @PostMapping("/refresh")

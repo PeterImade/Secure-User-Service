@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -71,6 +72,19 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
     }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidCredential(BadCredentialsException ex, HttpServletRequest request) {
+        log.error("Invalid credentials caught: {}", ex.getMessage());
+        var errorResponse = new ErrorResponse(
+                LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+                HttpStatus.FORBIDDEN.value(),
+                "Invalid email or password.",
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+    }
+
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex, HttpServletRequest request) {

@@ -3,10 +3,17 @@ package com.example.user_service.users;
 import com.example.user_service.exceptions.EmailAlreadyExistsException;
 import com.example.user_service.exceptions.InvalidCredentialsException;
 import com.example.user_service.exceptions.UserNotFoundException;
+import com.example.user_service.refresh.RefreshToken;
+import com.example.user_service.refresh.RefreshTokenService;
+import com.example.user_service.security.JWTService;
 import jakarta.persistence.Id;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,11 +25,16 @@ import java.util.stream.Collectors;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final JWTService jwtService;
+    private final RefreshTokenService refreshTokenService;
 
-    @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JWTService jwtService, RefreshTokenService refreshTokenService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
+        this.refreshTokenService = refreshTokenService;
     }
 
     public UserResponse registerUser(String name, String email, String password) {
@@ -31,7 +43,6 @@ public class UserService {
 
         if(userExists)
         {
-            // Create custom exceptions later and handle them globally
             throw new EmailAlreadyExistsException("User already exists");
         }
 
@@ -49,18 +60,24 @@ public class UserService {
         return new UserResponse(savedUser.getId(), savedUser.getName(), savedUser.getEmail(), savedUser.getRole());
     }
 
-    public UserResponse authenticateUser(String email, String rawPassword){
+    public AuthResponse authenticateUser(String email, String rawPassword){
 
-        User storedUser = userRepository.findByEmail(email).orElseThrow(() -> new InvalidCredentialsException("Invalid email or password."));
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, rawPassword));
 
-        boolean passwordMatches = passwordEncoder.matches(rawPassword, storedUser.getPassword());
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-        if (!passwordMatches)
-        {
-            throw new InvalidCredentialsException("Invalid email or password.");
-        }
+        User storedUser = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new UserNotFoundException("Invalid email or password"));
 
-        return new UserResponse(storedUser.getId(), storedUser.getName(), storedUser.getEmail(), storedUser.getRole());
+        var userResponse = new UserResponse(storedUser.getId(), storedUser.getName(), storedUser.getEmail(), storedUser.getRole());
+
+        // Generate access token
+        String accessToken = jwtService.generateToken(email);
+
+        // Generate refresh token
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(storedUser);
+
+        return new AuthResponse(accessToken, refreshToken.getToken(), userResponse);
     }
 
     public User findUserByEmail(String email)
